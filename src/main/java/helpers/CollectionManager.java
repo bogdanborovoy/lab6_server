@@ -17,6 +17,7 @@ import java.util.*;
  */
 public class CollectionManager implements Serializable {
 
+
     /**
      * Компаратор для сравнения элементов коллекции по ID.
      */
