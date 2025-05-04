@@ -47,7 +47,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>main.Main</mainClass>
+                            <mainClass>server.Server</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
