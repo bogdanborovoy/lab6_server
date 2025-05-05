@@ -1,8 +1,6 @@
 package helpers;
 
 import classes.*;
-import com.opencsv.CSVReader;
-import com.opencsv.exceptions.CsvValidationException;
 import commands.Command;
 import exceptions.WrongFileNameException;
 
@@ -10,6 +8,7 @@ import java.io.*;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Класс управления коллекцией космических кораблей
@@ -75,12 +74,9 @@ public class CollectionManager implements Serializable {
      * @return Строка с описанием всех команд
      */
     public String help(Invoker invoker) {
-        StringBuilder output = new StringBuilder();
-        for (Command c : invoker.getCommands().values()) {
-            output.append(c.descr()).append("\n");
-        }
+        String output = invoker.getCommands().values().stream().map(Command::descr).collect(Collectors.joining("\n"));
         System.out.println(output);
-        return output.toString();
+        return output;
     }
 
     /**
@@ -110,21 +106,19 @@ public class CollectionManager implements Serializable {
      * @return Строка с элементами коллекции
      */
     public String show(NavigableSet<SpaceMarine> spaceMarines) {
-        StringBuilder output = new StringBuilder();
-        for (SpaceMarine spaceMarine : spaceMarines) {
-            output.append(spaceMarine.toString()).append("\n");
-        }
-        if (spaceMarines.isEmpty()) {
-            output.append("Коллекция пустая");
+        String output = spaceMarines.stream().map(spaceMarine -> spaceMarine.toString()).collect(Collectors.joining("\n"));
+        if (output.isEmpty()) {
+            output = "Коллекция пустая";
         }
         System.out.println(output);
-        return output.toString();
+        return output;
     }
 
     public SpaceMarine add(String[] args){
         for(int i = 0; i < 8; i++) {
             args[i] = args[i].trim();
         }
+
         String name = args[0];
         Coordinates coordinates = new Coordinates(Integer.parseInt(args[1]), Integer.parseInt(args[2]));
         double health = Double.parseDouble(args[3]);
@@ -137,157 +131,42 @@ public class CollectionManager implements Serializable {
         System.out.println("Элемент добавлен");
         return spaceMarine;
     }
-    /**
-     * Добавляет новый элемент в коллекцию.
-     *
-     * @return Добавленный элемент
-     */
-    public SpaceMarine add(Scanner sc) {
-        SpaceMarine spaceMarine = new SpaceMarine();
-        spaceMarine.setId();
-        spaceMarine.setCreationDate();
-        try {
-            while (spaceMarine.getName() == null) {
-                try {
-                    System.out.println("Введите имя: ");
-                    spaceMarine.setName(sc.nextLine());
-                } catch (IllegalArgumentException e) {
-                    System.out.println(e.getMessage());
-                }
-            }
-
-            Coordinates coordinates = new Coordinates();
-
-            while (coordinates.getX() == null) {
-                try {
-                    System.out.println("Введите координаты по x: ");
-                    Integer x = Integer.parseInt(sc.nextLine());
-                    coordinates.setX(x);
-                } catch (NumberFormatException e) {
-                    System.out.println("Координаты должны быть целым числом от -2147483648 до 2147483647");
-                } catch (IllegalArgumentException e) {
-                    System.out.println(e.getMessage());
-                }
-            }
-            while (coordinates.getY() == 0) {
-                try {
-                    System.out.println("Введите координаты по y: ");
-                    int y = Integer.parseInt(sc.nextLine());
-                    coordinates.setY(y);
-                    if (y == 0) {
-                        break;
-                    }
-                } catch (NumberFormatException e) {
-                    System.out.println("Координаты должны быть целым числом от -2147483648 до 2147483647");
-                } catch (IllegalArgumentException e) {
-                    System.out.println(e.getMessage());
-                }
-            }
-
-            spaceMarine.setCoordinates(coordinates);
-
-            while (spaceMarine.getHealth() == 0) {
-                try {
-                    System.out.println("Введите показатель здоровья: ");
-                    double health = Double.parseDouble(sc.nextLine());
-                    spaceMarine.setHealth(health);
-                } catch (NumberFormatException e) {
-                    System.out.println("Показатель здоровья должен быть числом от 0 до 2147483647");
-                } catch (IllegalArgumentException e) {
-                    System.out.println(e.getMessage());
-                }
-            }
-            while (spaceMarine.getHeartCount() == 0) {
-                try {
-                    System.out.println("Введите количество сердец: ");
-                    int heartCount = Integer.parseInt(sc.nextLine());
-                    spaceMarine.setHeartCount(heartCount);
-                } catch (NumberFormatException e) {
-                    System.out.println("Количество сердец должно быть целым числом от 0 до 3");
-                } catch (IllegalArgumentException e) {
-                    System.out.println(e.getMessage());
-                }
-            }
-
-            System.out.print("Выберите тип десантника: ");
-            while (spaceMarine.getCategory() == null) {
-                try {
-                    AstartesCategory.printValues();
-                    String line = sc.nextLine().toUpperCase();
-                    spaceMarine.setCategory(AstartesCategory.valueOf(line));
-                } catch (IllegalArgumentException e) {
-                    System.out.println("Выберите тип из предложенных");
-                }
-            }
-
-            System.out.print("Выберите тип оружия: ");
-            while (spaceMarine.getMeleeWeapon() == null) {
-                try {
-                    MeleeWeapon.printValues();
-                    String line = sc.nextLine().toUpperCase();
-                    spaceMarine.setMeleeWeapon(MeleeWeapon.valueOf(line));
-                } catch (IllegalArgumentException e) {
-                    System.out.println("Выберите тип из предложенных");
-                }
-            }
-
-            Chapter chapter = new Chapter();
-            while (chapter.getName() == null) {
-                try {
-                    System.out.println("Введите название ордена: ");
-                    chapter.setName(sc.nextLine());
-                } catch (IllegalArgumentException e) {
-                    System.out.println(e.getMessage());
-                }
-            }
-
-            while (chapter.getMarinesCount() == null) {
-                try {
-                    System.out.println("Введите количество десантников: ");
-                    Integer marinesCount = Integer.parseInt(sc.nextLine());
-                    chapter.setMarinesCount(marinesCount);
-                } catch (NumberFormatException e) {
-                    System.out.println("Введите целое число от 0 до 1000");
-                } catch (IllegalArgumentException e) {
-                    System.out.println(e.getMessage());
-                }
-            }
-            spaceMarine.setChapter(chapter);
-            spaceMarines.add(spaceMarine);
-            System.out.println("Космический десантник создан");
-
-        }
-        catch (NoSuchElementException e) {
-            System.exit(0);
-        }
-        return spaceMarine;
-    }
     public void add(SpaceMarine spaceMarine) {
         spaceMarines.add(spaceMarine);
     }
+
     /**
      * Обновляет значение элемента коллекции по его ID.
      */
     public void updateID(SpaceMarine sm) {
-        int count = 0;
-        for (SpaceMarine spaceMarine : spaceMarines) {
+        boolean found = false;
+        Iterator<SpaceMarine> iterator = spaceMarines.iterator();
+        while (iterator.hasNext()) {
+            SpaceMarine spaceMarine = iterator.next();
             if (spaceMarine.getId() == sm.getId()) {
-                spaceMarines.remove(spaceMarine);
-                spaceMarines.add(new SpaceMarine());
+                iterator.remove();
+                spaceMarines.add(sm);
+                found = true;
             }
         }
-        System.out.println("Обновлено " + count + " элемент(а)");
+        if (found) {
+            System.out.println("Элемент найден и обновлен");
+        }
+        else {
+            System.out.println("Элемент не найден");
+        }
+
     }
 
 
 
     public void removeById(Long id) {
-        for (SpaceMarine spaceMarine : this.spaceMarines) {
-            if (spaceMarine.getId() == id) {
-                System.out.println("Элемент " + id + " удален");
-                spaceMarines.remove(spaceMarine);
-                break;
-            }
+        boolean removed = spaceMarines.removeIf(spaceMarine -> spaceMarine.getId() == id);
+        if (removed) {
+            System.out.println("Элемент " + id + " удален");
+        }
+        else {
+            System.out.println("Элемент " + id + " не найден");
         }
     }
     /**
@@ -322,7 +201,7 @@ public class CollectionManager implements Serializable {
      */
     public void save(NavigableSet<SpaceMarine> spaceMarines) {
         //export SAVE_IN="/home/studs/s465267/lab5/files/spacemarines.csv"
-        String fileName = "resources/files/spacemarines.csv";
+        String fileName = "/Users/bogdanborovoy/Desktop/lab6/server/src/main/resources/files/spacemarines.csv";
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(fileName))) {
             for (SpaceMarine spaceMarine : spaceMarines) {
                 bw.write(spaceMarine.toString());
@@ -334,54 +213,6 @@ public class CollectionManager implements Serializable {
         }
         catch (NullPointerException e) {
             System.out.println("Файл не указан");
-        }
-    }
-
-
-    /**
-     * Считывает и исполняет скрипт из указанного файла.
-     *
-     * @param invoker Инвокер, содержащий команды
-     */
-    public void executeScript(Invoker invoker) {
-        Scanner sc = new Scanner(System.in);
-        String script = null;
-        while (script == null) {
-            System.out.println("Введите путь к файлу: ");
-            script = sc.nextLine();
-            File file = new File(script);
-            try {
-                if (!file.exists()) {
-                    script = null;
-                    throw new WrongFileNameException();
-                }
-            } catch (WrongFileNameException e) {
-                continue;
-            }
-            try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(script))) {
-                InputStreamReader isr = new InputStreamReader(bis);
-                CSVReader csvReader = new CSVReader(isr);
-                String[] nextRecord;
-                while ((nextRecord = csvReader.readNext()) != null) {
-                    for (int i = 0; i < nextRecord.length; i++) {
-                        String name = nextRecord[i].trim();
-                        String[] tokens = name.split(" ");
-                        Command command = invoker.getCommands().get(tokens[0]);
-                        if (tokens.length > 1) {
-                            String[] args = Arrays.copyOfRange(tokens, 1, tokens.length);
-                            command.passValue(args);
-                        }
-                        command.setInteractive(false);
-                        System.out.println("Выполняется команда "+name);
-                        invoker.runCommand(command);
-                        command.setInteractive(true);
-                    }
-                }
-                System.out.println("Скрипт выполнен");
-                isr.close();
-            } catch (IOException | CsvValidationException e) {
-                System.out.println(e.getMessage());
-            }
         }
     }
 
@@ -424,12 +255,9 @@ public class CollectionManager implements Serializable {
      */
     public void removeGreater(SpaceMarine spaceMarine) {
         NavigableSet<SpaceMarine> lowerSpaceMarines = new TreeSet<>(spaceMarines.tailSet(spaceMarine, false));
-        int count = 0;
-        for (SpaceMarine lowerSpaceMarine : lowerSpaceMarines) {
-            spaceMarines.remove(lowerSpaceMarine);
-            count++;
-        }
-        spaceMarines.remove(spaceMarine);
+        int count = lowerSpaceMarines.size();
+        spaceMarines.removeAll(lowerSpaceMarines);
+
         System.out.println(count + " элемент(а) удалено");
     }
 
@@ -439,14 +267,9 @@ public class CollectionManager implements Serializable {
      * @param spaceMarine Элемент для сравнения
      */
     public void removeLower(SpaceMarine spaceMarine) {
-        System.out.println("Создание элемента");
         SortedSet<SpaceMarine> lowerSpaceMarines = new TreeSet<>(spaceMarines.headSet(spaceMarine));
-        int count = 0;
-        for (SpaceMarine lowerSpaceMarine : lowerSpaceMarines) {
-            spaceMarines.remove(lowerSpaceMarine);
-            count++;
-        }
-        spaceMarines.remove(spaceMarine);
+        int count = lowerSpaceMarines.size();
+        spaceMarines.removeAll(lowerSpaceMarines);
         System.out.println(count + " элемент(а) удалено");
     }
 
@@ -454,24 +277,12 @@ public class CollectionManager implements Serializable {
      * Выводит количество элементов, значение поля heartCount которых больше заданного.
      */
     public void countGreaterThanHeartCount(String args) {
-//        Scanner sc = new Scanner(System.in);
-//        System.out.println("Введите количество сердец: ");
-//        int heartCount = 0;
-//        while (heartCount == 0) {
-//            try {
-//                heartCount = Integer.parseInt(sc.nextLine());
-//            } catch (NumberFormatException e) {
-//                System.out.println("Количество сердец должно быть целым числом");
-//            }
-//        }
         try {
             int heartCount = Integer.parseInt(args);
-            int count = 0;
-            for (SpaceMarine spaceMarine : spaceMarines) {
-                if (spaceMarine.getHeartCount() > heartCount) {
-                    count++;
-                }
-            }
+            long count = spaceMarines.stream()
+                    .filter(spaceMarine -> spaceMarine.getHeartCount() > heartCount)
+                    .count();
+
             System.out.println("В коллекции " + count + " элементов, значение поля heartCount которых больше заданного");
         }
         catch (NumberFormatException e) {
@@ -485,11 +296,9 @@ public class CollectionManager implements Serializable {
      * Выводит элементы, значение поля name которых начинается с заданной подстроки.
      */
     public void filterStartsWithName(String name) {
-        for (SpaceMarine spaceMarine : spaceMarines) {
-            if (spaceMarine.getName().toLowerCase().startsWith(name.toLowerCase())) {
-                System.out.println(spaceMarine);
-            }
-        }
+        spaceMarines.stream()
+                .filter(spaceMarine -> spaceMarine.getName().toLowerCase().startsWith(name.toLowerCase()))
+                .forEach(System.out::println);
     }
 
 
@@ -500,13 +309,10 @@ public class CollectionManager implements Serializable {
      * @return Список значений health
      */
     public List<Double> printFieldAscendingHealth(NavigableSet<SpaceMarine> spaceMarines) {
-        List<Double> health_list = new ArrayList<>();
-        for (SpaceMarine spaceMarine : spaceMarines) {
-            health_list.add(spaceMarine.getHealth());
-            Collections.sort(health_list);
-        }
-        health_list.forEach(health -> System.out.print(health + " "));
-        System.out.println();
+        List<Double> health_list = spaceMarines.stream()
+                .map(spaceMarine -> spaceMarine.getHealth())
+                .sorted()
+                .peek(health -> System.out.print(health + " ")).toList();
         return health_list;
     }
 }

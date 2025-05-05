@@ -8,7 +8,6 @@
 /Users/bogdanborovoy/Desktop/lab6/server/src/main/java/commands/ClearCommand.java
 /Users/bogdanborovoy/Desktop/lab6/server/src/main/java/commands/Command.java
 /Users/bogdanborovoy/Desktop/lab6/server/src/main/java/commands/CountGreaterThanHeartCountCommand.java
-/Users/bogdanborovoy/Desktop/lab6/server/src/main/java/commands/ExecuteScriptCommand.java
 /Users/bogdanborovoy/Desktop/lab6/server/src/main/java/commands/ExitCommand.java
 /Users/bogdanborovoy/Desktop/lab6/server/src/main/java/commands/FilterStartsWithNameCommand.java
 /Users/bogdanborovoy/Desktop/lab6/server/src/main/java/commands/HelpCommand.java

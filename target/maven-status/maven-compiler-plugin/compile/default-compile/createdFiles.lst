@@ -6,7 +6,6 @@ server/Server.class
 commands/RemoveLowerCommand.class
 commands/ShowCommand.class
 commands/Command.class
-commands/ExecuteScriptCommand.class
 commands/SaveCommand.class
 helpers/CollectionManager.class
 commands/PrintFieldAscendingHealthCommand.class

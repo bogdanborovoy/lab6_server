@@ -26,7 +26,7 @@ public class Invoker implements Serializable {
         this.setCommand("remove_by_id", new RemoveByIDCommand(receiver));
         this.setCommand("clear", new ClearCommand(receiver));
 //        invoker.setCommand("save", new SaveCommand(receiver));
-        this.setCommand("execute_script", new ExecuteScriptCommand(receiver, this));
+//        this.setCommand("execute_script", new ExecuteScriptCommand(receiver, this));
         this.setCommand("exit", new ExitCommand(receiver));
         this.setCommand("add_if_max", new AddIfMaxCommand(receiver));
         this.setCommand("remove_greater", new RemoveGreaterCommand(receiver));
