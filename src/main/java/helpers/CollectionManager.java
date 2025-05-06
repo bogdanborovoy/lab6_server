@@ -1,6 +1,8 @@
 package helpers;
 
 import classes.*;
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvValidationException;
 import commands.Command;
 import exceptions.WrongFileNameException;
 
@@ -301,6 +303,33 @@ public class CollectionManager implements Serializable {
                 .forEach(System.out::println);
     }
 
+    public void executeScript(String script, Invoker invoker) {
+
+        try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(script))) {
+            InputStreamReader isr = new InputStreamReader(bis);
+            CSVReader csvReader = new CSVReader(isr);
+            String[] nextRecord;
+            while ((nextRecord = csvReader.readNext()) != null) {
+                for (int i = 0; i < nextRecord.length; i++) {
+                    String name = nextRecord[i].trim();
+                    String[] tokens = name.split(" ");
+                    Command command = invoker.getCommands().get(tokens[0]);
+                    if (tokens.length > 1) {
+                        String[] args = Arrays.copyOfRange(tokens, 1, tokens.length);
+                        command.passValue(args);
+                    }
+                    command.setInteractive(false);
+                    System.out.println("Выполняется команда "+name);
+                    invoker.runCommand(command);
+                    command.setInteractive(true);
+                }
+            }
+            System.out.println("Скрипт выполнен");
+            isr.close();
+        } catch (IOException | CsvValidationException e) {
+            System.out.println(e.getMessage());
+        }
+    }
 
     /**
      * Выводит значения поля health всех элементов в порядке возрастания.

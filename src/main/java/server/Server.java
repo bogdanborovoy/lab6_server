@@ -25,9 +25,11 @@ public class Server {
     Socket socket;
     CollectionManager cm;
     private static final Logger logger = LogManager.getLogger(Server.class);
+    Scanner scanner;
 
     Invoker invoker;
     public Server(int port) throws IOException {
+        scanner = new Scanner(System.in);
         serverSocket = new ServerSocket(port);
         cm = new CollectionManager();
         invoker = new Invoker(cm);
@@ -89,6 +91,10 @@ public class Server {
         try {
             String message = receiveObject(socket);
             sendObject(socket, message);
+            if (scanner.hasNextLine()) {
+                save();
+                System.exit(0);
+            }
         }
         catch (Exception e) {
 
@@ -99,12 +105,14 @@ public class Server {
         cm.save(cm.spaceMarines);
     }
     public static void main(String[] args) throws IOException {
-        Server server = new Server(2457);
+
+        int port = 2505;
+        Server server = new Server(port);
         logger.info("Начало работы сервера");
 
 
         try {
-            while (!server.serverSocket.isClosed()) {
+            while (true) {
                 server.connect();
                 server.handleClient();
                 server.save();
